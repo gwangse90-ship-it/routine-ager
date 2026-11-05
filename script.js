@@ -62,15 +62,31 @@ const quizResultHigh = "ADHD 가능성이 높게 나왔어요. 전문가와 상�
 const quizResultLow = "ADHD 가능성이 낮게 나왔어요. (임시 문구)";
 const quizNotice = "이 테스트는 진단이 아닙니다.";
 
-// [수정] 테스트가 끝난 뒤 보여 주는 응원 문구 (결과가 높음·낮음이어도 똑같이 나옴)
-// 문구를 바꾸고 싶으면 여기만 고치면 됩니다. 제목 > 부제목 > 본문(문단 3개) 순서로 화면에 나옵니다.
-const quizCareTitle = "괜찮아요, 혼자 해결하지 않아도 돼요.";
-const quizCareSub = "나를 이해하는 것부터 변화는 시작돼요.";
-const quizCareBody = [
-  "집중이 어렵거나 계획대로 되지 않는다고 해서 잘못된 것은 아니에요. 이번 테스트는 나의 생활 습관을 돌아보는 작은 시작이에요.",
-  "조금 더 정확하게 알아보고 싶거나 일상에서 어려움이 계속된다면 주변의 믿을 수 있는 어른이나 전문가에게 도움을 요청해도 괜찮아요.",
-  "천천히, 나에게 맞는 방법을 찾아가면 돼요.",
-];
+// [수정] 테스트가 끝난 뒤 보여 주는 응원 문구. 결과가 높으면 High, 낮으면 Low 문구가 나옵니다.
+// 문구를 바꾸고 싶으면 여기만 고치면 됩니다. 제목(title) > 부제목(sub) > 본문(body 문단 3개) 순서로 화면에 나옵니다.
+
+// 결과가 높을 때
+const quizCareHigh = {
+  title: "괜찮아요, 혼자 해결하지 않아도 돼요.",
+  sub: "나를 이해하는 것부터 변화는 시작돼요.",
+  body: [
+    "집중이 어렵거나 계획대로 되지 않는다고 해서 잘못된 것은 아니에요. 이번 테스트는 나의 생활 습관을 돌아보는 작은 시작이에요.",
+    "조금 더 정확하게 알아보고 싶거나 일상에서 어려움이 계속된다면 주변의 믿을 수 있는 어른이나 전문가에게 도움을 요청해도 괜찮아요.",
+    "천천히, 나에게 맞는 방법을 찾아가면 돼요.",
+  ],
+};
+
+// 결과가 낮을 때
+// 진단이 아니라는 점을 지키면서, '문제가 없다'고 단정하지 않는 표현으로 썼습니다.
+const quizCareLow = {
+  title: "걱정하지 않아도 돼요.",
+  sub: "지금의 나를 잘 돌보고 있다는 신호예요.",
+  body: [
+    "이번 테스트에서는 집중이나 생활 패턴에서 큰 어려움이 보이지 않았어요. 누구나 가끔은 미루고 깜빡할 때가 있고, 그건 아주 자연스러운 일이에요.",
+    "지금처럼 나를 돌아보는 습관은 정말 소중해요. 앞으로 힘든 일이 생기면 그때 주변 어른이나 전문가에게 편하게 이야기해도 돼요.",
+    "작은 루틴 하나부터 시작해서, 오늘의 좋은 흐름을 이어 가 봐요.",
+  ],
+};
 
 
 /* =====================================================
@@ -345,19 +361,21 @@ function renderQuizResult() {
 
   // [수정] 결과 화면 만들기
   // 원래 있던 "ADHD 가능성이 높게(낮게) 나왔어요" 한 줄(result)은 삭제했습니다.
-  // 대신 응원 문구를 제목 > 부제목 > 본문 순서로 만들어 칸에 넣습니다.
+  // 대신 결과에 맞는 응원 문구(높음: quizCareHigh, 낮음: quizCareLow)를 골라
+  // 제목 > 부제목 > 본문 순서로 만들어 칸에 넣습니다.
+  const care = isHigh ? quizCareHigh : quizCareLow;
   const title = document.createElement("h3");
   title.className = "quiz-result-title";
-  title.textContent = quizCareTitle;
+  title.textContent = care.title;
 
   const sub = document.createElement("p");
   sub.className = "quiz-result-sub";
-  sub.textContent = quizCareSub;
+  sub.textContent = care.sub;
 
-  // 본문 문단 3개: quizCareBody 목록을 하나씩 돌며 <p>를 만들어 붙임
+  // 본문 문단 3개: care.body 목록을 하나씩 돌며 <p>를 만들어 붙임
   const body = document.createElement("div");
   body.className = "quiz-result-body";
-  quizCareBody.forEach(function (line) {
+  care.body.forEach(function (line) {
     const p = document.createElement("p");
     p.textContent = line;
     body.appendChild(p);
