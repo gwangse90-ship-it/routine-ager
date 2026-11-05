@@ -1,0 +1,10 @@
+# 공개 저장소에 올리지 않는 파일: 작업 기록과 저장본
+versions/
+PROGRESS.md
+DESIGN.md
+.claude/
+.DS_Store
+
+# 지금 페이지에서 쓰지 않는 이미지
+images/worry-*.png
+images/hero-note.png
