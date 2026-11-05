@@ -911,21 +911,21 @@ a:focus-visible {
   bottom: -40px;
 }
 
-/* 결과 단계 이름 (예: LEVEL 2 · ADHD력 중간): 작고 은은하게 */
+/* [수정] 결과 단계 이름 (예: LEVEL 2 · ADHD력 중간): 작고 은은하게 */
 .quiz-result-label {
   margin: 0 0 12px;
   font-size: .85rem;
   font-weight: var(--weight-strong);
   opacity: .7;
 }
-/* 결과 멘트(큰 글씨): 화면 폭에 따라 1.3rem ~ 1.6rem 사이로 자동 조정 */
+/* [수정] 결과 멘트(큰 글씨): 화면 폭에 따라 1.3rem ~ 1.6rem 사이로 자동 조정 */
 .quiz-result-title {
   margin: 0 0 8px;
   font-family: var(--font-title);
   font-size: clamp(1.3rem, 3.4vw, 1.6rem);
   line-height: 1.35;
 }
-/* 결과 설명 (멘트 아래 한 줄) */
+/* [수정] 결과 설명 (멘트 아래 한 줄) */
 .quiz-result-sub {
   max-width: 40ch;
   margin: 0 auto 20px;
@@ -976,7 +976,7 @@ a:focus-visible {
   visibility: hidden;          /* 첫 질문에서는 보이지 않고 누를 수도 없음 (자리만 남김) */
 }
 
-/* "다시 테스트하기" 버튼: 칸 가운데에 놓고 위쪽 링크와 간격을 둠 */
+/* [수정] "다시 테스트하기" 버튼: 칸 가운데에 놓고 위쪽 링크와 간격을 둠 */
 .quiz-retry {
   align-self: center;
   margin-top: 18px;
@@ -985,7 +985,7 @@ a:focus-visible {
 /* 휴대폰(너비 575px 이하): 칸 높이를 고정하지 않고, 캐릭터는 작게 칸 안쪽으로 */
 @media (max-width: 575px) {
   .quiz-box { min-height: 0; padding: 36px 20px; }
-  .quiz-result-image { height: 88px; }
+  .quiz-result-image { height: 88px; } /* [수정] 휴대폰에서는 결과 그림을 더 작게 */
   .quiz-char-right { width: 92px; right: -8px; top: -46px; }
   .quiz-char-left { width: 68px; left: -8px; bottom: -34px; }
 }

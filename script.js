@@ -91,7 +91,7 @@ const quizLevels = [
   },
 ];
 
-// 결과 그림도 미리 불러 둠 (결과가 바로 뜨도록)
+// [수정] 결과 그림도 미리 불러 둠 (결과가 바로 뜨도록)
 quizLevels.forEach(function (level) {
   new Image().src = level.image;
 });
@@ -387,7 +387,7 @@ function renderQuizResult() {
 
   quizBox.innerHTML = "";
 
-  // 단계 이름 (예: LEVEL 2 · ADHD력 중간)
+  // [수정] 단계 이름 (예: LEVEL 2 · ADHD력 중간)
   const label = document.createElement("p");
   label.className = "quiz-result-label";
   label.textContent = level.label;
@@ -398,12 +398,12 @@ function renderQuizResult() {
   picture.src = level.image;
   picture.alt = level.imageAlt;
 
-  // 큰 한 줄 멘트
+  // [수정] 큰 한 줄 멘트 (단계마다 다른 문구)
   const title = document.createElement("h3");
   title.className = "quiz-result-title";
   title.textContent = level.title;
 
-  // 짧은 설명
+  // [수정] 멘트 아래 짧은 설명 (단계마다 다른 문구)
   const text = document.createElement("p");
   text.className = "quiz-result-sub";
   text.textContent = level.text;
@@ -416,7 +416,7 @@ function renderQuizResult() {
     notice.textContent = quizNoticeText;
   }
 
-  // "다시 테스트하기" 버튼: 누르면 점수와 질문 순서를 처음으로 되돌리고 첫 질문을 다시 보여 줌
+  // [수정] "다시 테스트하기" 버튼: 누르면 점수와 질문 순서를 처음으로 되돌리고 첫 질문을 다시 보여 줌
   const retryButton = document.createElement("button");
   retryButton.type = "button";
   retryButton.className = "btn btn-teal quiz-retry";
