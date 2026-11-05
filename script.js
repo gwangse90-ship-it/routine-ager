@@ -40,11 +40,11 @@ handImages.forEach(function (path) {
 
 // [수정] ADHD력 테스트 질문 5개. 이 목록에 문장을 추가하면 질문이 늘어납니다.
 const quizQuestions = [
-  "해야 할 일을 알고 있는데도 일단 미루고 본다.",
-  "방금까지 가지고 있던 물건을 어디에 뒀는지 자주 까먹는다.",
-  "공부나 과제를 하다가 다른 생각에 빠져 집중이 흐트러진다.",
-  "다른 사람이 말할 때 끝까지 듣지 못하고 중간에 끼어들거나 딴생각을 한다.?",
-  "가만히 앉아 있기 어렵거나 무언가를 계속 만지작거린다.",
+  "해야 할 일을 알고 있는데도 자꾸 미루나요?",
+  "방금까지 가지고 있던 물건을 어디에 뒀는지 자주 까먹나요?",
+  "공부나 과제를 하다가 다른 생각에 빠져 집중이 흐트러지나요?",
+  "다른 사람이 말할 때 끝까지 듣지 못하고 중간에 끼어들거나 딴생각을 하나요?",
+  "가만히 앉아 있기 어렵거나 무언가를 계속 만지작거리나요?",
 ];
 
 // 답 버튼 3개와 각 답의 점수 (모든 질문이 같은 답을 씀)
@@ -58,32 +58,47 @@ const quizAnswers = [
 // [수정] 총점에 따른 결과 3단계. 위에서부터 차례로 보고, 내 점수가 max 이하인 첫 단계가 결과가 됩니다.
 //  - 0~3점: LEVEL 1 (낮음) / 4~7점: LEVEL 2 (중간) / 8~10점: LEVEL 3 (높음)
 //  - 기준 점수를 바꾸고 싶으면 max 숫자만 고치면 됩니다.
-//  - label: 결과 위에 작게 보이는 단계 이름 / title: 큰 한 줄 멘트 / text: 짧은 설명
+//  - label: 결과 위에 작게 보이는 단계 이름 / image, imageAlt: 단계 이름과 멘트 사이에 보이는 그림과 설명
+//  - title: 큰 한 줄 멘트 / text: 짧은 설명
+//  - showNotice: true면 아래에 "ADHD 진단이 아닙니다" 안내가 나오고, false면 나오지 않음 (낮음은 false)
 const quizLevels = [
   {
     max: 3,
     label: "LEVEL 1 · ADHD력 낮음",
+    image: "images/result-low.png",
+    imageAlt: "편안하게 쉬며 웃고 있는 캐릭터",
     title: "“ADHD력? 오늘은 조용하네.”",
     text: "뇌가 제법 평화롭습니다. 이 정도면 일단 순항 중!",
+    showNotice: false,
   },
   {
     max: 7,
     label: "LEVEL 2 · ADHD력 중간",
+    image: "images/result-mid.png",
+    imageAlt: "딴생각에 빠져 턱을 괸 캐릭터",
     title: "“ADHD 호소인? 살짝 의심스럽군.”",
     text: "집중력과 딴생각이 치열한 눈치게임 중!",
+    showNotice: true,
   },
   {
     max: 10,
     label: "LEVEL 3 · ADHD력 높음",
+    image: "images/result-high.png",
+    imageAlt: "정신없어 하며 머리를 감싼 캐릭터",
     title: "“뇌 속에 탭을 27개 켜두셨나요?”",
     text: "ADHD력 높은 편! 혼자 고민하지 말고 전문가와 이야기해 봐요.",
+    showNotice: true,
   },
 ];
 
-// [수정] 모든 결과 아래에 아주 작은 글씨로 나오는 공통 안내
-const quizNoticeTitle = "잠깐! 이 테스트는 진단이 아닙니다.";
+// 결과 그림도 미리 불러 둠 (결과가 바로 뜨도록)
+quizLevels.forEach(function (level) {
+  new Image().src = level.image;
+});
+
+// [수정] 중간·높음 결과 아래에 나오는 안내 문구
 const quizNoticeText =
-  "이 결과는 일상 속 행동을 가볍게 돌아보기 위한 참고 자료입니다. 점수가 높다고 ADHD라는 뜻은 아니며, 정확한 진단은 전문의와 상담해 주세요.";
+  "잠깐! 이 테스트는 ADHD 진단을 내리는 검사가 아닙니다. 정확한 진단은 전문의와 상담해 주세요.";
 
 
 /* =====================================================
@@ -295,6 +310,7 @@ resetButton.addEventListener("click", function () {
 
 let quizIndex = 0; // 지금 보여 주는 질문의 순서 (0부터 시작)
 let quizScore = 0; // 지금까지 모은 점수
+let quizLog = []; // [수정] 지금까지 고른 답의 점수를 순서대로 적어 둠 ("이전" 버튼에서 되돌릴 때 사용)
 
 // 서비스 소개 섹션으로 가는 글자 링크 만들기
 function createQuizAboutLink() {
@@ -330,6 +346,7 @@ function renderQuestion() {
 
     button.addEventListener("click", function () {
       quizScore += answer.score;
+      quizLog.push(answer.score); // [수정] 방금 고른 답의 점수를 기록
       quizIndex += 1;
 
       if (quizIndex < quizQuestions.length) {
@@ -344,7 +361,20 @@ function renderQuestion() {
     answers.appendChild(button);
   });
 
-  quizBox.append(step, question, answers, createQuizAboutLink());
+  // [수정] "이전" 버튼: 잘못 골랐을 때 앞 질문으로 돌아감. 첫 질문에서는 누를 수 없게 막아 둠
+  const prevButton = document.createElement("button");
+  prevButton.type = "button";
+  prevButton.className = "btn btn-outline-teal quiz-prev";
+  prevButton.textContent = "이전";
+  prevButton.disabled = quizIndex === 0;
+  prevButton.addEventListener("click", function () {
+    quizIndex -= 1; // 한 질문 앞으로
+    quizScore -= quizLog.pop(); // 그 질문에서 더했던 점수를 빼고 기록에서도 지움
+    renderQuestion();
+    quizBox.focus({ preventScroll: true });
+  });
+
+  quizBox.append(step, question, answers, prevButton, createQuizAboutLink());
 }
 
 // 마지막 질문 뒤에 결과 보여 주기
@@ -361,6 +391,12 @@ function renderQuizResult() {
   label.className = "quiz-result-label";
   label.textContent = level.label;
 
+  // [수정] 단계 이름과 멘트 사이에 들어가는 결과 그림
+  const picture = document.createElement("img");
+  picture.className = "quiz-result-image";
+  picture.src = level.image;
+  picture.alt = level.imageAlt;
+
   // 큰 한 줄 멘트
   const title = document.createElement("h3");
   title.className = "quiz-result-title";
@@ -371,16 +407,13 @@ function renderQuizResult() {
   text.className = "quiz-result-sub";
   text.textContent = level.text;
 
-  // [수정] 공통 안내: 제목 + 설명을 아주 작은 글씨로
-  const notice = document.createElement("div");
-  notice.className = "quiz-notice-box";
-  const noticeTitle = document.createElement("p");
-  noticeTitle.className = "quiz-notice-title";
-  noticeTitle.textContent = quizNoticeTitle;
-  const noticeText = document.createElement("p");
-  noticeText.className = "quiz-notice-text";
-  noticeText.textContent = quizNoticeText;
-  notice.append(noticeTitle, noticeText);
+  // [수정] 안내 문구는 showNotice가 true인 단계(중간, 높음)에서만 만듦
+  let notice = null;
+  if (level.showNotice) {
+    notice = document.createElement("p");
+    notice.className = "quiz-notice-text";
+    notice.textContent = quizNoticeText;
+  }
 
   // "다시 테스트하기" 버튼: 누르면 점수와 질문 순서를 처음으로 되돌리고 첫 질문을 다시 보여 줌
   const retryButton = document.createElement("button");
@@ -390,13 +423,18 @@ function renderQuizResult() {
   retryButton.addEventListener("click", function () {
     quizIndex = 0; // 질문 순서를 처음(첫 번째 질문)으로
     quizScore = 0; // 모아 둔 점수도 0으로
+    quizLog = []; // [수정] 답 기록도 비움
     renderQuestion();
     // 키보드 사용자가 바뀐 내용을 바로 이어서 볼 수 있게 초점을 옮김
     quizBox.focus({ preventScroll: true });
   });
 
-  // 칸에 넣는 순서: 단계, 멘트, 설명, 공통 안내, 루틴 만들기 링크, 다시 테스트하기 버튼
-  quizBox.append(label, title, text, notice, createQuizAboutLink(), retryButton);
+  // 칸에 넣는 순서: 단계, 그림, 멘트, 설명, (안내), 루틴 만들기 링크, 다시 테스트하기 버튼
+  quizBox.append(label, picture, title, text);
+  if (notice) {
+    quizBox.append(notice); // 낮음 결과에서는 안내가 없으므로 건너뜀
+  }
+  quizBox.append(createQuizAboutLink(), retryButton);
 }
 
 
