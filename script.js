@@ -56,11 +56,14 @@ const quizAnswers = [
 const QUIZ_HIGH_RATE = 0.6;
 
 // 테스트 결과 문구 (임시 문구)
+// [참고] 아래 quizResultHigh, quizResultLow는 결과 한 줄 멘트를 지운 뒤로 화면에 쓰이지 않습니다.
+// 나중에 결과별 안내(위치 기반 병원 안내 등)를 만들 때 쓰려고 남겨 두었습니다.
 const quizResultHigh = "ADHD 가능성이 높게 나왔어요. 전문가와 상담해 보는 것을 권해요.";
 const quizResultLow = "ADHD 가능성이 낮게 나왔어요. (임시 문구)";
 const quizNotice = "이 테스트는 진단이 아닙니다.";
 
-// 테스트가 끝난 뒤 보여 주는 응원 문구 (결과가 높음·낮음이어도 똑같이 나옴)
+// [수정] 테스트가 끝난 뒤 보여 주는 응원 문구 (결과가 높음·낮음이어도 똑같이 나옴)
+// 문구를 바꾸고 싶으면 여기만 고치면 됩니다. 제목 > 부제목 > 본문(문단 3개) 순서로 화면에 나옵니다.
 const quizCareTitle = "괜찮아요, 혼자 해결하지 않아도 돼요.";
 const quizCareSub = "나를 이해하는 것부터 변화는 시작돼요.";
 const quizCareBody = [
@@ -340,7 +343,9 @@ function renderQuizResult() {
 
   quizBox.innerHTML = "";
 
-  // 응원 문구: 제목, 부제목, 본문
+  // [수정] 결과 화면 만들기
+  // 원래 있던 "ADHD 가능성이 높게(낮게) 나왔어요" 한 줄(result)은 삭제했습니다.
+  // 대신 응원 문구를 제목 > 부제목 > 본문 순서로 만들어 칸에 넣습니다.
   const title = document.createElement("h3");
   title.className = "quiz-result-title";
   title.textContent = quizCareTitle;
@@ -349,6 +354,7 @@ function renderQuizResult() {
   sub.className = "quiz-result-sub";
   sub.textContent = quizCareSub;
 
+  // 본문 문단 3개: quizCareBody 목록을 하나씩 돌며 <p>를 만들어 붙임
   const body = document.createElement("div");
   body.className = "quiz-result-body";
   quizCareBody.forEach(function (line) {
@@ -361,6 +367,7 @@ function renderQuizResult() {
   notice.className = "quiz-notice";
   notice.textContent = quizNotice;
 
+  // [수정] 칸에 넣는 순서: 제목, 부제목, 본문, 진단 아님 안내, 루틴 만들기 링크 (링크는 그대로 유지)
   quizBox.append(title, sub, body, notice, createQuizAboutLink());
 }
 
