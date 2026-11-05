@@ -361,12 +361,13 @@ function renderQuestion() {
     answers.appendChild(button);
   });
 
-  // [수정] "이전" 버튼: 잘못 골랐을 때 앞 질문으로 돌아감. 첫 질문에서는 누를 수 없게 막아 둠
+  // [수정] "이전" 버튼: 잘못 골랐을 때 앞 질문으로 돌아감. 첫 질문에서는 보이지 않고, 두 번째 질문부터 나타남
   const prevButton = document.createElement("button");
   prevButton.type = "button";
   prevButton.className = "btn btn-outline-teal quiz-prev";
   prevButton.textContent = "이전";
-  prevButton.disabled = quizIndex === 0;
+  // 첫 질문에서는 숨김. display가 아닌 visibility로 숨겨서 자리는 남겨 두므로, 질문이 바뀔 때 화면이 위아래로 덜컥 움직이지 않음
+  prevButton.classList.toggle("is-hidden", quizIndex === 0);
   prevButton.addEventListener("click", function () {
     quizIndex -= 1; // 한 질문 앞으로
     quizScore -= quizLog.pop(); // 그 질문에서 더했던 점수를 빼고 기록에서도 지움

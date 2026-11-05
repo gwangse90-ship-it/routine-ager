@@ -934,21 +934,46 @@ a:focus-visible {
   line-height: 1.6;
 }
 
-/* 공통 안내 "잠깐! 이 테스트는 진단이 아닙니다.": 아주 작은 글씨 */
-.quiz-notice-box {
-  max-width: 46ch;
-  margin: 0 auto 14px;
+/* [수정] 결과 그림: 단계 이름과 멘트 사이. 높이를 고정해 칸이 너무 커지지 않게 함 */
+.quiz-result-image {
+  align-self: center;
+  height: 112px;
+  width: auto;
+  margin: 0 0 10px;
 }
-.quiz-notice-title {
-  margin: 0 0 4px;
-  font-size: .72rem;
-  font-weight: var(--weight-strong);
-}
+
+/* [수정] 안내 "잠깐! 이 테스트는 ADHD 진단을 내리는 검사가 아닙니다...": 읽을 수 있는 작은 글씨 */
 .quiz-notice-text {
-  margin: 0;
-  font-size: .7rem;
-  line-height: 1.55;
-  opacity: .75;
+  max-width: 44ch;
+  margin: 0 auto 14px;
+  font-size: .85rem;
+  line-height: 1.6;
+  opacity: .85;
+}
+
+/* [수정] "이전" 버튼: 답 버튼 아래, 칸 가운데. 답 버튼보다 작고 테두리만 있는 모양 */
+.btn-outline-teal {
+  --bs-btn-color: var(--teal);
+  --bs-btn-border-color: var(--teal);
+  --bs-btn-hover-bg: var(--teal);
+  --bs-btn-hover-color: var(--cream);
+  --bs-btn-hover-border-color: var(--teal);
+  --bs-btn-active-bg: var(--teal);
+  --bs-btn-active-color: var(--cream);
+  --bs-btn-active-border-color: var(--teal);
+  --bs-btn-disabled-color: var(--teal);
+  --bs-btn-disabled-border-color: var(--teal);
+  background: transparent;
+}
+.quiz-prev {
+  --bs-btn-padding-y: 6px;     /* 위의 .btn 기본값(48px 높이)보다 작게 */
+  --bs-btn-padding-x: 22px;
+  --bs-btn-font-size: .9rem;
+  align-self: center;
+  margin: 16px 0 6px;
+}
+.quiz-prev.is-hidden {
+  visibility: hidden;          /* 첫 질문에서는 보이지 않고 누를 수도 없음 (자리만 남김) */
 }
 
 /* "다시 테스트하기" 버튼: 칸 가운데에 놓고 위쪽 링크와 간격을 둠 */
@@ -960,6 +985,7 @@ a:focus-visible {
 /* 휴대폰(너비 575px 이하): 칸 높이를 고정하지 않고, 캐릭터는 작게 칸 안쪽으로 */
 @media (max-width: 575px) {
   .quiz-box { min-height: 0; padding: 36px 20px; }
+  .quiz-result-image { height: 88px; }
   .quiz-char-right { width: 92px; right: -8px; top: -46px; }
   .quiz-char-left { width: 68px; left: -8px; bottom: -34px; }
 }
