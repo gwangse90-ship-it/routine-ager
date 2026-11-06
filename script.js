@@ -109,7 +109,7 @@ const quizLevels = [
 
 // [추가 수정 4] 시작 전 안내 문구와 높음 결과의 도움 안내 (임시 문구)
 // 상담 전화번호는 반드시 공식 사이트(예: 복지로, 청소년상담복지센터)에서 한 번 더 확인한 뒤 쓰세요.
-const quizIntroText = "5문항 · 약 1분 · 진단이 아니에요";
+const quizIntroText = "5문항 · 약 1분"; // [추가 수정 9] "진단이 아니에요" 삭제
 const quizHelpPhone = "청소년상담 1388 (24시간, 전화·문자·카카오톡)";
 
 // [수정] 결과 그림도 미리 불러 둠 (결과가 바로 뜨도록)
@@ -367,7 +367,7 @@ function renderQuestion() {
   const step = document.createElement("p");
   step.className = "quiz-step";
   // [수정] 표시 글자를 "질문 1 / 5"에서 "순서 1 / 5"로 바꿈
-  step.textContent = "순서 " + (quizIndex + 1) + " / " + quizQuestions.length;
+  step.textContent = "테스트 " + (quizIndex + 1)  /* [추가 수정 9] "순서" -> "테스트" */  + " / " + quizQuestions.length;
 
   // [추가 수정 4] 진행 막대: 가는 청록색 막대가 질문마다 차오름 (직전 위치에서 새 위치로 움직임)
   const bar = document.createElement("div");
@@ -440,10 +440,18 @@ function renderQuestion() {
   const prevButton = document.createElement("button");
   prevButton.type = "button";
   prevButton.className = "btn btn-outline-teal quiz-prev";
-  prevButton.textContent = "이전";
-  // 첫 질문에서는 숨김. display가 아닌 visibility로 숨겨서 자리는 남겨 두므로, 질문이 바뀔 때 화면이 위아래로 덜컥 움직이지 않음
-  prevButton.classList.toggle("is-hidden", quizIndex === 0);
+  // [추가 수정 9] 첫 질문에도 버튼을 보여 주고, 이름은 "처음으로". 누르면 시작 전 안내 화면으로 돌아감
+  prevButton.textContent = quizIndex === 0 ? "처음으로" : "이전";
   prevButton.addEventListener("click", function () {
+    if (quizIndex === 0) {
+      quizStarted = false;
+      quizPrevChoice = null;
+      quizLastIndex = 0;
+      document.getElementById("test").classList.remove("is-started"); // 머리말을 다시 보이게 하고 칸 크기도 시작 전으로
+      renderQuestion(); // quizStarted가 false라서 시작 전 안내 화면이 나옴
+      quizBox.focus({ preventScroll: true });
+      return;
+    }
     quizIndex -= 1; // 한 질문 앞으로
     const undone = quizLog.pop(); // 그 질문에서 고른 답을 기록에서 꺼냄
     quizScore -= undone.score;    // 더했던 점수를 뺌
@@ -464,7 +472,8 @@ function renderQuizIntro() {
 
   const title = document.createElement("p");
   title.className = "quiz-intro-title";
-  title.textContent = "나의 ADHD력, 지금 확인해 볼까요?";
+  // [추가 수정 9] 쉼표를 없애고 "지금 확인해 볼까요?"를 다음 줄로 내림
+  title.append("나의 ADHD력", document.createElement("br"), "지금 확인해 볼까요?");
 
   const info = document.createElement("p");
   info.className = "quiz-intro-info";
