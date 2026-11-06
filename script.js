@@ -68,11 +68,13 @@ const quizLevels = [
     label: "LEVEL 1 · ADHD력 낮음",
     image: "images/result-low.png",
     imageAlt: "편안하게 쉬며 웃고 있는 캐릭터",
-    title: "“ADHD력? 오늘은 조용하네.”",
+    titleMain: "ADHD력?",            // [추가 수정 6] 큰 제목(위 줄)
+    titleSub: "오늘은 조용하네.",     // [추가 수정 6] 작은 제목(아래 줄)
     text: "뇌가 제법 평화롭습니다. 이 정도면 일단 순항 중!",
     showNotice: false,
     color: "#CDE8C4",   // [추가 수정 4] 결과 색 포인트: 초록 (일러스트 배경과 같은 계열)
-    tip: "팁: 지금 습관을 지키려면 오늘 할 일 5개를 적고 하나씩 접어 보세요.", // (임시 문구)
+    tint: "#EEF7EA",    // [추가 수정 6] 팁 상자 바탕색(연한 초록)
+    tipParts: ["지금 습관을 지키려면 오늘 할 일 ", "5개만 적고", " 하나씩 접어 보세요."], // [추가 수정 6] [앞 글자, 굵게 할 글자, 뒤 글자] (임시 문구)
     showHelp: false,
   },
   {
@@ -80,11 +82,13 @@ const quizLevels = [
     label: "LEVEL 2 · ADHD력 중간",
     image: "images/result-mid.png",
     imageAlt: "딴생각에 빠져 턱을 괸 캐릭터",
-    title: "“ADHD 호소인? 살짝 의심스럽군.”",
+    titleMain: "ADHD 호소인?",
+    titleSub: "살짝 의심스럽군.",
     text: "집중력과 딴생각이 치열한 눈치게임 중!",
     showNotice: true,
     color: "#FFE7A3",   // 노랑
-    tip: "팁: 해야 할 일을 아주 작게 쪼개서, 그중 하나만 먼저 시작해 봐요.", // (임시 문구)
+    tint: "#FFF5D6",    // 연한 노랑
+    tipParts: ["해야 할 일을 아주 작게 쪼개서,\n그중 ", "하나만 먼저", " 시작해 봐요."],
     showHelp: false,
   },
   {
@@ -92,11 +96,13 @@ const quizLevels = [
     label: "LEVEL 3 · ADHD력 높음",
     image: "images/result-high.png",
     imageAlt: "정신없어 하며 머리를 감싼 캐릭터",
-    title: "“뇌 속에 탭을 27개 켜두셨나요?”",
+    titleMain: "뇌 속에 탭을",
+    titleSub: "27개 켜두셨나요?",
     text: "ADHD력 높은 편! 혼자 고민하지 말고 전문가와 이야기해 봐요.",
     showNotice: true,
     color: "#F8CFDB",   // 분홍
-    tip: "팁: 오늘은 딱 한 가지만! 5분짜리 작은 루틴부터 시작해 봐요.", // (임시 문구)
+    tint: "#FDE8EE",    // 연한 분홍
+    tipParts: ["오늘은 ", "딱 한 가지만!", "\n5분짜리 작은 루틴부터 시작해 봐요."],
     showHelp: true,     // true면 결과 아래에 도움 안내 자리가 나옴 (높음만)
   },
 ];
@@ -330,6 +336,13 @@ let quizStarted = false;   // [추가 수정 4] 시작 전 안내 화면을 이�
 let quizPrevChoice = null; // [추가 수정 4] "이전"으로 돌아왔을 때 방금 고른 답 버튼의 순서 (은은하게 표시)
 let quizLastIndex = 0;     // [추가 수정 4] 진행 막대가 이전 위치에서 차오르게 하려고 직전 질문 순서를 기억
 
+// [추가 수정 6] 하얀 칸 아래의 작은 안내 문구("이 테스트는 진단이 아닙니다")를 보이거나 숨김. 자리는 그대로 남겨 두어 화면이 덜컥 움직이지 않음
+const quizFootNotice = document.getElementById("quizNotice");
+quizFootNotice.textContent = quizNoticeText;
+function showFootNotice(show) {
+  quizFootNotice.classList.toggle("is-visible", show);
+}
+
 // 서비스 소개 섹션으로 가는 글자 링크 만들기
 function createQuizAboutLink() {
   const link = document.createElement("a");
@@ -341,6 +354,7 @@ function createQuizAboutLink() {
 
 // 지금 순서의 질문 보여 주기
 function renderQuestion() {
+  showFootNotice(false);
   // [추가 수정 4] 처음 한 번은 시작 전 안내 화면을 보여 줌
   if (!quizStarted) {
     renderQuizIntro();
@@ -443,6 +457,7 @@ function renderQuestion() {
 
 // [추가 수정 4] 시작 전 안내 화면: 문항 수, 시간, 진단이 아니라는 점을 먼저 알림
 function renderQuizIntro() {
+  showFootNotice(false);
   quizBox.innerHTML = "";
 
   const title = document.createElement("p");
@@ -460,7 +475,10 @@ function renderQuizIntro() {
   start.addEventListener("click", function () {
     quizStarted = true;
     quizLastIndex = 0;
+    // [추가 수정 6] 시작하면 섹션 3 머리말(ADHD TEST / 제목 / 설명)을 숨기고, 하얀 칸이 더 넓어지게 함 (style.css의 #test.is-started)
+    document.getElementById("test").classList.add("is-started");
     renderQuestion();
+    quizBox.scrollIntoView({ block: "center" });
     quizBox.focus({ preventScroll: true });
   });
 
@@ -468,6 +486,8 @@ function renderQuizIntro() {
 }
 
 // 마지막 질문 뒤에 결과 보여 주기
+// [추가 수정 6] 결과 칸 구성: 단계 알약 > 큰 제목(2줄) > 그림 > 설명 > 팁 상자 > (높음: 도움 안내) > 루틴 버튼 > 다시 테스트하기(글자 버튼) > 건강한 루틴 링크
+//               하얀 칸 아래: "진단이 아닙니다" 작은 안내(중간·높음)
 function renderQuizResult() {
   // [수정] 총점에 맞는 결과 단계 찾기 (find: 조건에 처음 맞는 칸을 돌려줌)
   const level = quizLevels.find(function (item) {
@@ -476,42 +496,49 @@ function renderQuizResult() {
 
   quizBox.innerHTML = "";
 
-  // [수정] 단계 이름 (예: LEVEL 2 · ADHD력 중간)
+  // 단계 이름 (예: LEVEL 2 · ADHD력 중간). 결과 색을 깐 알약 모양
   const label = document.createElement("p");
   label.className = "quiz-result-label";
   label.textContent = level.label;
-  label.style.backgroundColor = level.color; // [추가 수정 4] 결과 색 포인트(알약 모양 배경)
+  label.style.backgroundColor = level.color;
 
-  // [수정] 단계 이름과 멘트 사이에 들어가는 결과 그림
+  // 큰 제목 두 줄: 위 줄은 크게, 아래 줄은 작게
+  const title = document.createElement("h3");
+  title.className = "quiz-result-title";
+  const titleMain = document.createElement("span");
+  titleMain.className = "quiz-result-title-main";
+  titleMain.textContent = level.titleMain;
+  const titleSub = document.createElement("span");
+  titleSub.className = "quiz-result-title-sub";
+  titleSub.textContent = level.titleSub;
+  title.append(titleMain, titleSub);
+
+  // 결과 그림
   const picture = document.createElement("img");
   picture.className = "quiz-result-image";
   picture.src = level.image;
   picture.alt = level.imageAlt;
 
-  // [수정] 큰 한 줄 멘트 (단계마다 다른 문구)
-  const title = document.createElement("h3");
-  title.className = "quiz-result-title";
-  title.textContent = level.title;
-
-  // [수정] 멘트 아래 짧은 설명 (단계마다 다른 문구)
+  // 그림 아래 짧은 설명 (굵게)
   const text = document.createElement("p");
   text.className = "quiz-result-sub";
   text.textContent = level.text;
 
-  // [수정] 안내 문구는 showNotice가 true인 단계(중간, 높음)에서만 만듦
-  let notice = null;
-  if (level.showNotice) {
-    notice = document.createElement("p");
-    notice.className = "quiz-notice-text";
-    notice.textContent = quizNoticeText;
-  }
-
-  // [추가 수정 4] 결과별 한 줄 팁
-  const tip = document.createElement("p");
+  // 팁 상자: "오늘의 작은 팁!" 제목 + 내용(일부 굵게). 바탕색은 결과 색의 연한 버전
+  const tip = document.createElement("div");
   tip.className = "quiz-tip";
-  tip.textContent = level.tip;
+  tip.style.backgroundColor = level.tint;
+  const tipHead = document.createElement("p");
+  tipHead.className = "quiz-tip-head";
+  tipHead.textContent = "오늘의 작은 팁!";
+  const tipBody = document.createElement("p");
+  tipBody.className = "quiz-tip-body";
+  const tipBold = document.createElement("strong");
+  tipBold.textContent = level.tipParts[1];
+  tipBody.append(level.tipParts[0], tipBold, level.tipParts[2]);
+  tip.append(tipHead, tipBody);
 
-  // [추가 수정 4] 높음 결과 아래 도움 안내 자리: 상담 전화(고정 안내) + 가까운 상담센터 찾기(준비 중, 위치 기반은 나중에 구현)
+  // 높음 결과의 도움 안내 자리: 상담 전화(고정 안내) + 가까운 상담센터 찾기(준비 중, 위치 기반은 나중에 구현)
   let help = null;
   if (level.showHelp) {
     help = document.createElement("div");
@@ -527,7 +554,7 @@ function renderQuizResult() {
     help.append(phone, find);
   }
 
-  // [추가 수정 4] "오늘 루틴 5개 만들어 보기": 결과와 상관없이 루틴 체험(섹션 2, #try)으로 이동
+  // "오늘 루틴 5개 만들어 보기": 결과와 상관없이 루틴 체험(섹션 2, #try)으로 이동
   const routineButton = document.createElement("a");
   routineButton.className = "btn btn-teal quiz-routine";
   routineButton.href = "#try";
@@ -539,34 +566,30 @@ function renderQuizResult() {
     }, 600);
   });
 
-  // [수정] "다시 테스트하기" 버튼: 누르면 점수와 질문 순서를 처음으로 되돌리고 첫 질문을 다시 보여 줌
+  // "다시 테스트하기": 상자 없이 글자만 있는 버튼. 누르면 점수와 질문 순서를 처음으로 되돌리고 첫 질문을 보여 줌
   const retryButton = document.createElement("button");
   retryButton.type = "button";
-  retryButton.className = "btn btn-teal quiz-retry";
+  retryButton.className = "quiz-retry";
   retryButton.textContent = "다시 테스트하기";
   retryButton.addEventListener("click", function () {
     quizIndex = 0; // 질문 순서를 처음(첫 번째 질문)으로
     quizScore = 0; // 모아 둔 점수도 0으로
-    quizLog = []; // [수정] 답 기록도 비움
+    quizLog = []; // 답 기록도 비움
     quizPrevChoice = null;
     quizLastIndex = 0;
-    renderQuestion(); // [추가 수정 4] 시작 전 안내는 이미 봤으므로 바로 첫 질문으로
+    renderQuestion(); // 시작 전 안내는 이미 봤으므로 바로 첫 질문으로
     // 키보드 사용자가 바뀐 내용을 바로 이어서 볼 수 있게 초점을 옮김
     quizBox.focus({ preventScroll: true });
   });
 
-  // 칸에 넣는 순서: 단계, 그림, 멘트, 설명, 팁, (안내), (도움 안내), 버튼 두 개, 서비스 소개 링크
-  quizBox.append(label, picture, title, text, tip);
-  if (notice) {
-    quizBox.append(notice); // 낮음 결과에서는 안내가 없으므로 건너뜀
-  }
+  quizBox.append(label, title, picture, text, tip);
   if (help) {
     quizBox.append(help); // 높음 결과에서만
   }
-  const buttonRow = document.createElement("div");
-  buttonRow.className = "quiz-buttons";
-  buttonRow.append(routineButton, retryButton);
-  quizBox.append(buttonRow, createQuizAboutLink());
+  quizBox.append(routineButton, retryButton, createQuizAboutLink());
+
+  // 하얀 칸 아래 안내: showNotice가 true인 단계(중간, 높음)에서만 보임
+  showFootNotice(level.showNotice);
 }
 
 
