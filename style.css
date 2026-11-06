@@ -1464,3 +1464,96 @@ a:focus-visible {
   .quiz-prev.is-hidden { display: inline-block; visibility: hidden; }
   .quiz-box .quiz-prev ~ .quiz-link { margin-top: 32px; }
 }
+
+/* ===================================================================
+   [추가 수정 8] 섹션 3 전용 글꼴: 제목은 손글씨 느낌의 "Ownglyph corncorn", 나머지는 "LINE Seed Sans KR"
+   - 글꼴 파일은 fonts 폴더에 있음 (woff 형식으로 변환해 둠. 원본 ttf/otf와 같은 글꼴)
+   - 역할 나누기
+       제목(가장 큼)      : Ownglyph corncorn  - "ADHD력 테스트", 시작 화면 인사, 결과 큰 제목 두 줄
+       소제목·강조·버튼   : LINE Seed Bold(700) - 영문 소제목, 단계 알약, 질문, 답/버튼, 팁 제목, 결과 설명
+       본문               : LINE Seed Regular(400) - 설명, 팁 내용, 안내, 링크
+       아주 작고 희미한 글 : LINE Seed Thin(100)  - 하얀 칸 아래 "진단이 아닙니다" 안내
+   - 섹션 3(#test)에서만 적용되고, 다른 섹션 글꼴은 그대로
+   - Ownglyph corncorn은 굵기가 한 가지뿐이라 font-weight 400으로 쓰고, 가짜 굵게(font-synthesis)는 끔
+   =================================================================== */
+@font-face {
+  font-family: "Ownglyph corncorn";
+  src: url("fonts/OwnglyphCorncorn-Regular.woff") format("woff");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "LINE Seed KR";
+  src: url("fonts/LINESeedKR-Th.woff") format("woff");
+  font-weight: 100;
+  font-display: swap;
+}
+@font-face {
+  font-family: "LINE Seed KR";
+  src: url("fonts/LINESeedKR-Rg.woff") format("woff");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "LINE Seed KR";
+  src: url("fonts/LINESeedKR-Bd.woff") format("woff");
+  font-weight: 700;
+  font-display: swap;
+}
+
+#test {
+  --font-display: "Ownglyph corncorn", "Jua", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --font-ui: "LINE Seed KR", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  font-family: var(--font-ui);
+  font-weight: 400;
+  font-synthesis: none;
+}
+#test .btn,
+#test button,
+#test input { font-family: var(--font-ui); }
+
+/* 섹션 머리말(시작 전에 보이는 인사) */
+#test .section-eyebrow { font-weight: 700; letter-spacing: .1em; opacity: .75; }
+#test .section-head .section-title { font-family: var(--font-display); font-weight: 400; font-size: clamp(2.2rem, 4.4vw, 3.9rem); letter-spacing: 0; }
+#test .section-text { font-weight: 400; }
+
+/* 시작 화면 */
+#test .quiz-intro-title { font-family: var(--font-display); font-weight: 400; font-size: 2.3rem; line-height: 1.25; letter-spacing: 0; }
+#test .quiz-intro-info { font-weight: 400; opacity: .8; }
+#test .quiz-start { font-weight: 700; }
+
+/* 질문 화면 */
+#test .quiz-step { font-weight: 700; }
+#test .quiz-question { font-weight: 700; }
+#test .quiz-answer,
+#test .quiz-prev { font-weight: 700; }
+#test .quiz-link { font-weight: 400; }
+
+/* 결과 화면 */
+#test .quiz-result-label { font-weight: 700; }
+#test .quiz-result-title { font-family: var(--font-display); font-weight: 400; letter-spacing: 0; }
+#test .quiz-result-title-main { font-weight: 400; font-size: 3rem; line-height: 1.1; }
+#test .quiz-result-title-sub { font-weight: 400; font-size: 1.7rem; margin-top: 2px; }
+#test .quiz-result-sub { font-weight: 700; }
+#test .quiz-tip-head { font-weight: 700; }
+#test .quiz-tip-body { font-weight: 400; }
+#test .quiz-tip-body strong { font-weight: 700; }
+#test .quiz-help-phone { font-weight: 700; }
+#test .quiz-help-find { font-weight: 400; }
+#test .quiz-routine,
+#test .quiz-retry { font-weight: 700; }
+
+/* 하얀 칸 아래 안내: 가장 얇은 글꼴로 아주 작고 희미하게 */
+.quiz-foot-notice { font-family: "LINE Seed KR", "Noto Sans KR", sans-serif; font-weight: 100; opacity: .7; font-size: .78rem; }
+
+@media (max-width: 575px) {
+  #test .quiz-intro-title { font-size: 1.9rem; }
+  #test .quiz-result-title-main { font-size: 2.4rem; }
+  #test .quiz-result-title-sub { font-size: 1.4rem; }
+}
+
+/* 글꼴이 바뀌면서 결과 칸(특히 높음)이 빽빽해져, 시작한 뒤 하얀 칸 높이를 조금 키움 (컴퓨터 790 -> 800px, 휴대폰 700 -> 780px) */
+#test.is-started .quiz-box { height: 800px; }
+@media (max-width: 575px) {
+  #test.is-started .quiz-box { height: 780px; }
+}
