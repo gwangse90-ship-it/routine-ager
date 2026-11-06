@@ -355,6 +355,7 @@ function createQuizAboutLink() {
 // 지금 순서의 질문 보여 주기
 function renderQuestion() {
   showFootNotice(false);
+  quizBox.classList.remove("is-result");
   // [추가 수정 4] 처음 한 번은 시작 전 안내 화면을 보여 줌
   if (!quizStarted) {
     renderQuizIntro();
@@ -458,6 +459,7 @@ function renderQuestion() {
 // [추가 수정 4] 시작 전 안내 화면: 문항 수, 시간, 진단이 아니라는 점을 먼저 알림
 function renderQuizIntro() {
   showFootNotice(false);
+  quizBox.classList.remove("is-result");
   quizBox.innerHTML = "";
 
   const title = document.createElement("p");
@@ -569,7 +571,7 @@ function renderQuizResult() {
   // "다시 테스트하기": 상자 없이 글자만 있는 버튼. 누르면 점수와 질문 순서를 처음으로 되돌리고 첫 질문을 보여 줌
   const retryButton = document.createElement("button");
   retryButton.type = "button";
-  retryButton.className = "quiz-retry";
+  retryButton.className = "btn btn-outline-teal quiz-retry"; // [추가 수정 7] 실선 테두리 버튼 (btn-outline-teal)
   retryButton.textContent = "다시 테스트하기";
   retryButton.addEventListener("click", function () {
     quizIndex = 0; // 질문 순서를 처음(첫 번째 질문)으로
@@ -582,6 +584,7 @@ function renderQuizResult() {
     quizBox.focus({ preventScroll: true });
   });
 
+  quizBox.classList.add("is-result"); // [추가 수정 7] 결과 화면 표시: 내용을 칸 세로 중앙에 고르게 배치 (style.css .is-result)
   quizBox.append(label, title, picture, text, tip);
   if (help) {
     quizBox.append(help); // 높음 결과에서만
@@ -590,6 +593,9 @@ function renderQuizResult() {
 
   // 하얀 칸 아래 안내: showNotice가 true인 단계(중간, 높음)에서만 보임
   showFootNotice(level.showNotice);
+
+  // [추가 수정 7] 결과가 뜨면 화면 가운데에 오도록 스크롤 (휴대폰에서 결과가 너무 위로 올라가 보이던 문제)
+  quizBox.scrollIntoView({ block: "center" });
 }
 
 
