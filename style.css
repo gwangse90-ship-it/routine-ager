@@ -951,7 +951,9 @@ a:focus-visible {
   opacity: .85;
 }
 
-/* [수정] "이전" 버튼: 답 버튼 아래, 칸 가운데. 답 버튼보다 작고 테두리만 있는 모양 */
+/* [수정] 테두리 버튼 (답 버튼과 "이전" 버튼 공통)
+   - 기본: 흰 바탕 + 진한 청록색 테두리(2px)와 글자 -> 흰 칸 위에서도 선이 또렷하게 보임
+   - 마우스를 올리면: 예전 답 버튼 색(진한 청록색)으로 채워지고 글자는 크림색이 됨 */
 .btn-outline-teal {
   --bs-btn-color: var(--teal);
   --bs-btn-border-color: var(--teal);
@@ -963,8 +965,41 @@ a:focus-visible {
   --bs-btn-active-border-color: var(--teal);
   --bs-btn-disabled-color: var(--teal);
   --bs-btn-disabled-border-color: var(--teal);
-  background: transparent;
+  background: var(--white);    /* 이전에는 transparent(투명)였음 */
+  border-width: 2px;           /* 선이 잘 보이도록 */
 }
+/* 누르는 순간과 키보드로 선택했을 때도 같은 색으로 바뀜 */
+.btn-outline-teal:active,
+.btn-outline-teal:focus-visible {
+  background: var(--teal);
+  color: var(--cream);
+  border-color: var(--teal);
+}
+/* 마우스를 올렸을 때 색 바꾸기. 터치 화면은 손가락을 뗀 뒤에도 색이 남을 수 있어서, 마우스가 있는 기기에서만 적용 */
+@media (hover: hover) {
+  .btn-outline-teal:hover {
+    background: var(--teal);
+    color: var(--cream);
+    border-color: var(--teal);
+  }
+}
+
+/* [수정] 질문 문장: 글자를 5px 줄임 (24px -> 19px) */
+.quiz-question {
+  margin-bottom: 20px;
+  font-size: 1.1875rem;
+}
+
+/* [수정] 답 버튼 3개: 글자에 맞게 작게 줄이고(높이 약 43px), 가운데에 같은 너비로 맞춤 */
+.quiz-answer {
+  --bs-btn-padding-y: 8px;     /* 위의 .btn 기본값(48px 높이)보다 작게 */
+  --bs-btn-padding-x: 20px;
+  --bs-btn-font-size: .95rem;
+  width: min(100%, 280px);     /* 최대 280px, 칸이 좁으면 칸 너비에 맞춤 */
+  justify-self: center;        /* grid 안에서 가운데로 */
+}
+
+/* [수정] "이전" 버튼: 답 버튼 아래, 칸 가운데. 답 버튼보다 작은 테두리 버튼 (색 변화는 위의 .btn-outline-teal이 담당) */
 .quiz-prev {
   --bs-btn-padding-y: 6px;     /* 위의 .btn 기본값(48px 높이)보다 작게 */
   --bs-btn-padding-x: 22px;
@@ -982,10 +1017,20 @@ a:focus-visible {
   margin-top: 18px;
 }
 
-/* 휴대폰(너비 575px 이하): 칸 높이를 고정하지 않고, 캐릭터는 작게 칸 안쪽으로 */
+/* [수정] 휴대폰(너비 575px 이하): 하얀 칸을 더 작게 줄이고, 구름 캐릭터가 위쪽 설명 글자와 겹치지 않게 함 */
 @media (max-width: 575px) {
-  .quiz-box { min-height: 0; padding: 36px 20px; }
-  .quiz-result-image { height: 88px; } /* [수정] 휴대폰에서는 결과 그림을 더 작게 */
-  .quiz-char-right { width: 92px; right: -8px; top: -46px; }
+  /* 칸 너비: 화면보다 40px 줄여 좌우에 여백을 더 줌 (이전 24px) */
+  /* padding-top: 설명 글자와 칸 사이를 28px 더 벌려서 구름이 들어갈 자리를 만듦 */
+  .quiz-wrap { width: calc(100% - 40px); padding-top: 28px; }
+  /* 칸 안쪽 위아래 여백을 줄임 */
+  .quiz-box { min-height: 0; padding: 26px 16px; }
+  .quiz-question { margin-bottom: 16px; }
+  .quiz-answer { width: min(100%, 240px); }
+  /* 첫 질문에서는 "이전" 버튼이 자리까지 없어지게 해서, 답 버튼 아래 빈 공간이 생기지 않게 함 */
+  .quiz-prev.is-hidden { display: none; }
+  .quiz-link { margin-top: 12px; }
+  .quiz-result-image { height: 88px; } /* 휴대폰에서는 결과 그림을 더 작게 */
+  /* 구름: 크기를 조금 줄이고 오른쪽으로 옮김. top은 위 padding-top(28px) 때문에 칸 위쪽에서 12px 위 정도에 놓임 */
+  .quiz-char-right { width: 84px; right: -16px; top: -12px; }
   .quiz-char-left { width: 68px; left: -8px; bottom: -34px; }
 }

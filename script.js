@@ -328,7 +328,8 @@ function renderQuestion() {
 
   const step = document.createElement("p");
   step.className = "quiz-step";
-  step.textContent = "질문 " + (quizIndex + 1) + " / " + quizQuestions.length;
+  // [수정] 표시 글자를 "질문 1 / 5"에서 "순서 1 / 5"로 바꿈
+  step.textContent = "순서 " + (quizIndex + 1) + " / " + quizQuestions.length;
 
   const question = document.createElement("p");
   question.className = "quiz-question";
@@ -341,7 +342,9 @@ function renderQuestion() {
   quizAnswers.forEach(function (answer) {
     const button = document.createElement("button");
     button.type = "button";
-    button.className = "btn btn-teal";
+    // [수정] 채운 청록색 버튼(btn-teal) 대신 테두리 버튼(btn-outline-teal)으로 바꿈: 흰 바탕에서 선이 보이고, 마우스를 올리면 색이 채워짐
+    // quiz-answer: 버튼 크기를 글자에 맞게 줄이는 클래스 (style.css)
+    button.className = "btn btn-outline-teal quiz-answer";
     button.textContent = answer.label;
 
     button.addEventListener("click", function () {
