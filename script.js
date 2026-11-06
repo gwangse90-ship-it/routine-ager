@@ -349,17 +349,29 @@ function renderQuestion() {
     button.textContent = answer.label;
 
     button.addEventListener("click", function () {
-      quizScore += answer.score;
-      quizLog.push(answer.score); // [수정] 방금 고른 답의 점수를 기록
-      quizIndex += 1;
-
-      if (quizIndex < quizQuestions.length) {
-        renderQuestion();
-      } else {
-        renderQuizResult();
+      // [추가 수정] 모바일(터치)에서도 누른 버튼의 색이 바뀌어 보이도록:
+      // 누른 버튼에 is-selected(색 채움)를 붙이고, 0.25초 뒤에 다음 질문으로 넘어감.
+      // (예전에는 누르자마자 질문이 바뀌어서 터치 화면에서는 색 변화를 볼 수 없었음)
+      if (quizBox.classList.contains("is-busy")) {
+        return; // 넘어가는 중에 한 번 더 눌러도 점수가 두 번 더해지지 않게 막음
       }
-      // 키보드 사용자가 바뀐 내용을 바로 이어서 볼 수 있게 초점을 옮김
-      quizBox.focus({ preventScroll: true });
+      quizBox.classList.add("is-busy");
+      button.classList.add("is-selected");
+
+      setTimeout(function () {
+        quizBox.classList.remove("is-busy");
+        quizScore += answer.score;
+        quizLog.push(answer.score); // 방금 고른 답의 점수를 기록
+        quizIndex += 1;
+
+        if (quizIndex < quizQuestions.length) {
+          renderQuestion();
+        } else {
+          renderQuizResult();
+        }
+        // 키보드 사용자가 바뀐 내용을 바로 이어서 볼 수 있게 초점을 옮김
+        quizBox.focus({ preventScroll: true });
+      }, 250);
     });
 
     answers.appendChild(button);
@@ -475,3 +487,6 @@ function renderAll() {
 // 페이지가 처음 열릴 때 화면을 그리고 첫 번째 질문을 보여 줌
 renderAll();
 renderQuestion();
+
+// [추가 수정] iOS 사파리에서도 버튼을 누르는 동안 :active 색이 나오게 함 (빈 touchstart 등록)
+document.addEventListener("touchstart", function () {}, { passive: true });

@@ -1114,3 +1114,20 @@ a:focus-visible {
   .quiz-notice-text  { font-size: .66rem; }
   .quiz-link         { margin-top: 4px; font-size: .8rem; }
 }
+
+/* ===================================================================
+   [추가 수정 3] 섹션 3: 터치(모바일)에서도 답 버튼 색이 바뀌게 함
+   - 마우스를 올렸을 때(hover)의 색과 같은 색을, 누른 버튼(.is-selected)에 항상 적용
+   - hover는 마우스 기기에서만 동작해서, 터치 화면에서는 script.js가 붙여 주는 is-selected로 색을 바꿈
+   - 터치 시 파란 눌림 표시(tap highlight)는 끔
+   =================================================================== */
+.btn-outline-teal.is-selected,
+.btn-outline-teal.is-selected:hover {
+  background: var(--teal);
+  color: var(--cream);
+  border-color: var(--teal);
+}
+.quiz-answer {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
