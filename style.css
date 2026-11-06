@@ -1131,3 +1131,141 @@ a:focus-visible {
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
+
+/* ===================================================================
+   [추가 수정 4] 섹션 3: 시작 전 안내 / 진행 막대 / 이전 답 표시 / 결과 팁·도움 안내·루틴 버튼
+                         / 결과 색 포인트 / 부드러운 전환 / 카드 가장자리
+   - 결과 화면에 팁, 도움 안내, 버튼이 늘어난 만큼 하얀 칸 높이를 키움 (PC 440 -> 540px, 휴대폰 400 -> 560px)
+     단, 질문 화면과 결과 화면의 칸 높이는 여전히 같게 고정
+   =================================================================== */
+
+/* 카드 가장자리: 크림 배경 위에서 경계가 또렷하게 아주 연한 테두리와 그림자 */
+.quiz-box {
+  height: 540px;
+  border: 1px solid rgba(2, 52, 63, 0.08);
+  box-shadow: 0 8px 24px rgba(2, 52, 63, 0.08);
+}
+
+/* 시작 전 안내 화면 */
+.quiz-intro-title {
+  margin: 0 0 12px;
+  font-family: var(--font-title);
+  font-size: 1.6rem;
+  line-height: 1.3;
+}
+.quiz-intro-info {
+  margin: 0 0 24px;
+  font-size: .95rem;
+  font-weight: var(--weight-strong);
+  opacity: .75;
+}
+.quiz-start {
+  align-self: center;
+  min-width: 160px;
+}
+
+/* 진행 막대: "순서 1 / 5" 아래의 가는 청록색 막대 */
+.quiz-progress {
+  width: min(100%, 280px);
+  height: 6px;
+  margin: 0 auto 20px;
+  border-radius: 999px;
+  background: rgba(2, 52, 63, 0.12);
+  overflow: hidden;
+}
+.quiz-progress-fill {
+  width: 0;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--teal);
+  transition: width .4s ease;
+}
+
+/* "이전"으로 돌아왔을 때 방금 고른 답: 은은한 크림색 바탕 + 점선 테두리 (마우스를 올리면 평소처럼 채워짐) */
+.quiz-answer.is-previous {
+  background: var(--cream);
+  border-style: dashed;
+}
+
+/* 결과 단계 이름: 결과 색(초록/노랑/분홍)을 깐 작은 알약 모양. 색은 script.js가 정해 줌 */
+.quiz-result-label {
+  align-self: center;
+  padding: 3px 14px;
+  border-radius: 999px;
+  opacity: 1;
+  color: var(--teal);
+}
+
+/* 결과별 한 줄 팁 */
+.quiz-tip {
+  max-width: 44ch;
+  margin: 0 auto 6px;
+  font-size: .8rem;
+  line-height: 1.45;
+  text-align: center;
+  text-wrap: balance;
+  word-break: keep-all;
+}
+
+/* 높음 결과의 도움 안내 자리 */
+.quiz-help {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin: 2px auto 4px;
+  padding: 8px 14px;
+  border-radius: var(--radius-small);
+  background: var(--cream-soft);
+  font-size: .78rem;
+  font-weight: var(--weight-strong);
+  text-align: center;
+}
+.quiz-help-find {
+  padding: 3px 12px;
+  border: 1px dashed var(--teal);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--teal);
+  font-size: .75rem;
+  opacity: .6;           /* 준비 중이라 흐리게 */
+}
+
+/* 결과의 버튼 두 개: "오늘 루틴 5개 만들어 보기"(주 버튼) + "다시 테스트하기" */
+.quiz-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+.quiz-routine,
+.quiz-buttons .quiz-retry {
+  --bs-btn-padding-y: 7px;
+  --bs-btn-padding-x: 18px;
+  --bs-btn-font-size: .88rem;
+  margin: 0;
+}
+.quiz-buttons + .quiz-link { margin-top: 8px; font-size: .8rem; }
+
+/* 부드러운 전환: 질문/결과가 바뀔 때 가볍게 나타나고, 결과 그림은 살짝 튀어나오듯 등장.
+   움직임을 줄이도록 설정한 사용자(prefers-reduced-motion)에게는 적용하지 않음 */
+@keyframes quizFade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes quizPop  { 0% { opacity: 0; transform: scale(.85); } 60% { opacity: 1; transform: scale(1.05); } 100% { transform: scale(1); } }
+@media (prefers-reduced-motion: no-preference) {
+  .quiz-box > * { animation: quizFade .25s ease both; }
+  .quiz-box > .quiz-result-image { animation: quizPop .45s cubic-bezier(.34, 1.56, .64, 1) both; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .quiz-progress-fill { transition: none; }
+}
+
+@media (max-width: 575px) {
+  .quiz-box { height: 580px; }
+  .quiz-intro-title { font-size: 1.3rem; }
+  .quiz-progress { margin-bottom: 16px; }
+  .quiz-result-image { height: 130px; }   /* 휴대폰: 칸 안에 모두 들어가도록 150 -> 130px */
+  .quiz-tip { font-size: .74rem; }
+  .quiz-help { font-size: .72rem; padding: 6px 10px; }
+  .quiz-routine, .quiz-buttons .quiz-retry { --bs-btn-padding-x: 14px; --bs-btn-font-size: .82rem; }
+}

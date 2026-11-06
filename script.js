@@ -71,6 +71,9 @@ const quizLevels = [
     title: "“ADHD력? 오늘은 조용하네.”",
     text: "뇌가 제법 평화롭습니다. 이 정도면 일단 순항 중!",
     showNotice: false,
+    color: "#CDE8C4",   // [추가 수정 4] 결과 색 포인트: 초록 (일러스트 배경과 같은 계열)
+    tip: "팁: 지금 습관을 지키려면 오늘 할 일 5개를 적고 하나씩 접어 보세요.", // (임시 문구)
+    showHelp: false,
   },
   {
     max: 7,
@@ -80,6 +83,9 @@ const quizLevels = [
     title: "“ADHD 호소인? 살짝 의심스럽군.”",
     text: "집중력과 딴생각이 치열한 눈치게임 중!",
     showNotice: true,
+    color: "#FFE7A3",   // 노랑
+    tip: "팁: 해야 할 일을 아주 작게 쪼개서, 그중 하나만 먼저 시작해 봐요.", // (임시 문구)
+    showHelp: false,
   },
   {
     max: 10,
@@ -89,8 +95,16 @@ const quizLevels = [
     title: "“뇌 속에 탭을 27개 켜두셨나요?”",
     text: "ADHD력 높은 편! 혼자 고민하지 말고 전문가와 이야기해 봐요.",
     showNotice: true,
+    color: "#F8CFDB",   // 분홍
+    tip: "팁: 오늘은 딱 한 가지만! 5분짜리 작은 루틴부터 시작해 봐요.", // (임시 문구)
+    showHelp: true,     // true면 결과 아래에 도움 안내 자리가 나옴 (높음만)
   },
 ];
+
+// [추가 수정 4] 시작 전 안내 문구와 높음 결과의 도움 안내 (임시 문구)
+// 상담 전화번호는 반드시 공식 사이트(예: 복지로, 청소년상담복지센터)에서 한 번 더 확인한 뒤 쓰세요.
+const quizIntroText = "5문항 · 약 1분 · 진단이 아니에요";
+const quizHelpPhone = "청소년상담 1388 (24시간, 전화·문자·카카오톡)";
 
 // [수정] 결과 그림도 미리 불러 둠 (결과가 바로 뜨도록)
 quizLevels.forEach(function (level) {
@@ -311,7 +325,10 @@ resetButton.addEventListener("click", function () {
 
 let quizIndex = 0; // 지금 보여 주는 질문의 순서 (0부터 시작)
 let quizScore = 0; // 지금까지 모은 점수
-let quizLog = []; // [수정] 지금까지 고른 답의 점수를 순서대로 적어 둠 ("이전" 버튼에서 되돌릴 때 사용)
+let quizLog = []; // 지금까지 고른 답을 순서대로 적어 둠 ("이전" 버튼에서 되돌릴 때 사용). [추가 수정 4] 한 칸의 모양: { score: 점수, choice: 고른 답 버튼 순서 }
+let quizStarted = false;   // [추가 수정 4] 시작 전 안내 화면을 이미 지났는지
+let quizPrevChoice = null; // [추가 수정 4] "이전"으로 돌아왔을 때 방금 고른 답 버튼의 순서 (은은하게 표시)
+let quizLastIndex = 0;     // [추가 수정 4] 진행 막대가 이전 위치에서 차오르게 하려고 직전 질문 순서를 기억
 
 // 서비스 소개 섹션으로 가는 글자 링크 만들기
 function createQuizAboutLink() {
@@ -324,6 +341,11 @@ function createQuizAboutLink() {
 
 // 지금 순서의 질문 보여 주기
 function renderQuestion() {
+  // [추가 수정 4] 처음 한 번은 시작 전 안내 화면을 보여 줌
+  if (!quizStarted) {
+    renderQuizIntro();
+    return;
+  }
   // 칸을 비우고 새 내용을 그림. 한 칸 안에서 내용이 바뀌는 방식
   quizBox.innerHTML = "";
 
@@ -331,6 +353,24 @@ function renderQuestion() {
   step.className = "quiz-step";
   // [수정] 표시 글자를 "질문 1 / 5"에서 "순서 1 / 5"로 바꿈
   step.textContent = "순서 " + (quizIndex + 1) + " / " + quizQuestions.length;
+
+  // [추가 수정 4] 진행 막대: 가는 청록색 막대가 질문마다 차오름 (직전 위치에서 새 위치로 움직임)
+  const bar = document.createElement("div");
+  bar.className = "quiz-progress";
+  bar.setAttribute("role", "progressbar");
+  bar.setAttribute("aria-valuemin", "0");
+  bar.setAttribute("aria-valuemax", quizQuestions.length);
+  bar.setAttribute("aria-valuenow", quizIndex);
+  const barFill = document.createElement("div");
+  barFill.className = "quiz-progress-fill";
+  barFill.style.width = (quizLastIndex / quizQuestions.length) * 100 + "%";
+  bar.appendChild(barFill);
+  requestAnimationFrame(function () {
+    requestAnimationFrame(function () {
+      barFill.style.width = (quizIndex / quizQuestions.length) * 100 + "%";
+      quizLastIndex = quizIndex;
+    });
+  });
 
   const question = document.createElement("p");
   question.className = "quiz-question";
@@ -340,13 +380,17 @@ function renderQuestion() {
   answers.className = "quiz-answers";
 
   // 답 버튼 만들기: 누르면 점수를 더하고 다음 질문이나 결과로 넘어감
-  quizAnswers.forEach(function (answer) {
+  quizAnswers.forEach(function (answer, answerIndex) {
     const button = document.createElement("button");
     button.type = "button";
     // [수정] 채운 청록색 버튼(btn-teal) 대신 테두리 버튼(btn-outline-teal)으로 바꿈: 흰 바탕에서 선이 보이고, 마우스를 올리면 색이 채워짐
     // quiz-answer: 버튼 크기를 글자에 맞게 줄이는 클래스 (style.css)
     button.className = "btn btn-outline-teal quiz-answer";
     button.textContent = answer.label;
+    // [추가 수정 4] "이전"으로 돌아왔을 때, 방금 고른 답을 은은하게 표시
+    if (quizPrevChoice === answerIndex) {
+      button.classList.add("is-previous");
+    }
 
     button.addEventListener("click", function () {
       // [추가 수정] 모바일(터치)에서도 누른 버튼의 색이 바뀌어 보이도록:
@@ -361,7 +405,7 @@ function renderQuestion() {
       setTimeout(function () {
         quizBox.classList.remove("is-busy");
         quizScore += answer.score;
-        quizLog.push(answer.score); // 방금 고른 답의 점수를 기록
+        quizLog.push({ score: answer.score, choice: answerIndex }); // 방금 고른 답을 기록
         quizIndex += 1;
 
         if (quizIndex < quizQuestions.length) {
@@ -386,12 +430,41 @@ function renderQuestion() {
   prevButton.classList.toggle("is-hidden", quizIndex === 0);
   prevButton.addEventListener("click", function () {
     quizIndex -= 1; // 한 질문 앞으로
-    quizScore -= quizLog.pop(); // 그 질문에서 더했던 점수를 빼고 기록에서도 지움
+    const undone = quizLog.pop(); // 그 질문에서 고른 답을 기록에서 꺼냄
+    quizScore -= undone.score;    // 더했던 점수를 뺌
+    quizPrevChoice = undone.choice; // [추가 수정 4] 그 답을 은은하게 표시하려고 기억
     renderQuestion();
     quizBox.focus({ preventScroll: true });
   });
 
-  quizBox.append(step, question, answers, prevButton, createQuizAboutLink());
+  quizPrevChoice = null; // 한 번 표시했으면 비움
+  quizBox.append(step, bar, question, answers, prevButton, createQuizAboutLink());
+}
+
+// [추가 수정 4] 시작 전 안내 화면: 문항 수, 시간, 진단이 아니라는 점을 먼저 알림
+function renderQuizIntro() {
+  quizBox.innerHTML = "";
+
+  const title = document.createElement("p");
+  title.className = "quiz-intro-title";
+  title.textContent = "나의 ADHD력, 지금 확인해 볼까요?";
+
+  const info = document.createElement("p");
+  info.className = "quiz-intro-info";
+  info.textContent = quizIntroText;
+
+  const start = document.createElement("button");
+  start.type = "button";
+  start.className = "btn btn-teal quiz-start";
+  start.textContent = "시작하기";
+  start.addEventListener("click", function () {
+    quizStarted = true;
+    quizLastIndex = 0;
+    renderQuestion();
+    quizBox.focus({ preventScroll: true });
+  });
+
+  quizBox.append(title, info, start);
 }
 
 // 마지막 질문 뒤에 결과 보여 주기
@@ -407,6 +480,7 @@ function renderQuizResult() {
   const label = document.createElement("p");
   label.className = "quiz-result-label";
   label.textContent = level.label;
+  label.style.backgroundColor = level.color; // [추가 수정 4] 결과 색 포인트(알약 모양 배경)
 
   // [수정] 단계 이름과 멘트 사이에 들어가는 결과 그림
   const picture = document.createElement("img");
@@ -432,6 +506,39 @@ function renderQuizResult() {
     notice.textContent = quizNoticeText;
   }
 
+  // [추가 수정 4] 결과별 한 줄 팁
+  const tip = document.createElement("p");
+  tip.className = "quiz-tip";
+  tip.textContent = level.tip;
+
+  // [추가 수정 4] 높음 결과 아래 도움 안내 자리: 상담 전화(고정 안내) + 가까운 상담센터 찾기(준비 중, 위치 기반은 나중에 구현)
+  let help = null;
+  if (level.showHelp) {
+    help = document.createElement("div");
+    help.className = "quiz-help";
+    const phone = document.createElement("span");
+    phone.className = "quiz-help-phone";
+    phone.textContent = quizHelpPhone;
+    const find = document.createElement("button");
+    find.type = "button";
+    find.className = "quiz-help-find";
+    find.disabled = true;
+    find.textContent = "가까운 상담센터 찾기 (준비 중)";
+    help.append(phone, find);
+  }
+
+  // [추가 수정 4] "오늘 루틴 5개 만들어 보기": 결과와 상관없이 루틴 체험(섹션 2, #try)으로 이동
+  const routineButton = document.createElement("a");
+  routineButton.className = "btn btn-teal quiz-routine";
+  routineButton.href = "#try";
+  routineButton.textContent = "오늘 루틴 5개 만들어 보기";
+  routineButton.addEventListener("click", function () {
+    // 이동한 뒤 입력칸에 바로 쓸 수 있게 초점을 옮김
+    setTimeout(function () {
+      routineInput.focus({ preventScroll: true });
+    }, 600);
+  });
+
   // [수정] "다시 테스트하기" 버튼: 누르면 점수와 질문 순서를 처음으로 되돌리고 첫 질문을 다시 보여 줌
   const retryButton = document.createElement("button");
   retryButton.type = "button";
@@ -441,17 +548,25 @@ function renderQuizResult() {
     quizIndex = 0; // 질문 순서를 처음(첫 번째 질문)으로
     quizScore = 0; // 모아 둔 점수도 0으로
     quizLog = []; // [수정] 답 기록도 비움
-    renderQuestion();
+    quizPrevChoice = null;
+    quizLastIndex = 0;
+    renderQuestion(); // [추가 수정 4] 시작 전 안내는 이미 봤으므로 바로 첫 질문으로
     // 키보드 사용자가 바뀐 내용을 바로 이어서 볼 수 있게 초점을 옮김
     quizBox.focus({ preventScroll: true });
   });
 
-  // 칸에 넣는 순서: 단계, 그림, 멘트, 설명, (안내), 루틴 만들기 링크, 다시 테스트하기 버튼
-  quizBox.append(label, picture, title, text);
+  // 칸에 넣는 순서: 단계, 그림, 멘트, 설명, 팁, (안내), (도움 안내), 버튼 두 개, 서비스 소개 링크
+  quizBox.append(label, picture, title, text, tip);
   if (notice) {
     quizBox.append(notice); // 낮음 결과에서는 안내가 없으므로 건너뜀
   }
-  quizBox.append(createQuizAboutLink(), retryButton);
+  if (help) {
+    quizBox.append(help); // 높음 결과에서만
+  }
+  const buttonRow = document.createElement("div");
+  buttonRow.className = "quiz-buttons";
+  buttonRow.append(routineButton, retryButton);
+  quizBox.append(buttonRow, createQuizAboutLink());
 }
 
 
